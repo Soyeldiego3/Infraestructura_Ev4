@@ -3,14 +3,14 @@ version: "3.8"
 services:
   app:
     build:
-      context: ../Api_Laravel_Ev4/api_catalogo
+      context: /home/ec2-user/Api_Laravel_Ev4/api_catalogo
       dockerfile: Dockerfile
     container_name: api-php
-    env_file: .env
+    env_file: /home/ec2-user/app/.env
     expose:
       - "9000"
     volumes:
-      - ../Api_Laravel_Ev4/api_catalogo:/var/www/html
+      - /home/ec2-user/Api_Laravel_Ev4/api_catalogo:/var/www/html
     networks:
       - api-network
 
@@ -20,8 +20,8 @@ services:
     ports:
       - "8000:80"
     volumes:
-      - ../Api_Laravel_Ev4/api_catalogo:/var/www/html
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - /home/ec2-user/Api_Laravel_Ev4/api_catalogo:/var/www/html
+      - /home/ec2-user/app/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - app
     networks:
