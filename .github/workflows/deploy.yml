@@ -46,4 +46,5 @@ jobs:
       - name: Verify Deployment
         run: |
           sleep 30
-          curl -f http://${{ secrets.SERVER_IP }}:8000 || exit 1
+          curl -f http://${{ secrets.SERVER_IP }} || exit 1
+          curl -f http://${{ secrets.SERVER_IP }}:9001 || exit 1
