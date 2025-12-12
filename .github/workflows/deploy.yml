@@ -19,15 +19,20 @@ jobs:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/api-key.pem
-          chmod 400 ~/.ssh/api-key.pem
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/api_ev4.pem
+          chmod 400 ~/.ssh/api_ev4.pem
+          ls -la ~/.ssh/api_ev4.pem
+
+      - name: Test SSH Connection
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/api_ev4.pem ec2-user@${{ secrets.SERVER_IP }} "echo 'SSH Connection OK'"
 
       - name: Create inventory dynamically
         run: |
           mkdir -p ansible
           cat > ansible/inventory.ini <<EOF
           [api_servers]
-          production ansible_host=${{ secrets.SERVER_IP }} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/api-key.pem
+          production ansible_host=${{ secrets.SERVER_IP }} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/api_ev4.pem
 
           [api_servers:vars]
           ansible_python_interpreter=/usr/bin/python3
