@@ -2,9 +2,7 @@ version: "3.8"
 
 services:
   app:
-    build:
-      context: /home/ec2-user/Api_Laravel_Ev4/api_catalogo
-      dockerfile: Dockerfile
+    image: panc1to/laravel-api:latest
     container_name: api-php
     env_file: /home/ec2-user/app/.env
     expose:
