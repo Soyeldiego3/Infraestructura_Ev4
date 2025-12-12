@@ -24,21 +24,21 @@ services:
     networks:
       - api-network
 
-sonarqube:
-  image: sonarqube:community
-  container_name: sonarqube
-  ports:
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    ports:
       - "9001:9000"
-  environment:
+    environment:
       - SONAR_JDBC_URL=jdbc:postgresql://db:5432/sonarqube
       - SONAR_JDBC_USERNAME=sonar
       - SONAR_JDBC_PASSWORD=sonar
-  networks:
+    networks:
       - api-network
-  depends_on:
+    depends_on:
       - db
 
-db:
+  db:
     image: postgres:13
     container_name: sonarqube-db
     environment:
