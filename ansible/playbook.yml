@@ -5,15 +5,15 @@
 
   tasks:
     - name: Update system
-      apt:
+      yum:
+        name: '*'
+        state: latest
         update_cache: yes
-        upgrade: dist
 
-    - name: Install Docker
-      apt:
+    - name: Install dependencies
+      yum:
         name:
-          - docker.io
-          - docker-compose
+          - docker
           - git
         state: present
 
@@ -29,17 +29,26 @@
         groups: docker
         append: yes
 
+    - name: Install Docker Compose
+      shell: |
+        curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        chmod +x /usr/local/bin/docker-compose
+      args:
+        creates: /usr/local/bin/docker-compose
+
     - name: Clone infrastructure repo
       git:
         repo: https://github.com/Soyeldiego3/Infraestructura_Ev4.git
         dest: /home/ec2-user/app
         version: main
+        force: yes
 
     - name: Clone API repo
       git:
         repo: https://github.com/Soyeldiego3/Api_Laravel_Ev4.git
         dest: /home/ec2-user/Api_Laravel_Ev4
         version: main
+        force: yes
 
     - name: Create .env file
       copy:
@@ -56,8 +65,12 @@
     - name: Deploy with Docker Compose
       shell: |
         cd /home/ec2-user/app
-        docker-compose down
+        docker-compose down || true
         docker-compose up -d --build
+
+    - name: Wait for containers
+      pause:
+        seconds: 30
 
     - name: Run migrations
       shell: docker exec api-php php artisan migrate --force
