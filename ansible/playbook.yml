@@ -29,15 +29,18 @@
         groups: docker
         append: yes
 
-    - name: Reset ssh connection to apply group changes
-      meta: reset_connection
-
     - name: Install Docker Compose
       shell: |
         curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
         chmod +x /usr/local/bin/docker-compose
-      args:
-        creates: /usr/local/bin/docker-compose
+
+    - name: Create app directory
+      file:
+        path: /home/ec2-user/app
+        state: directory
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'
 
     - name: Clone infrastructure repo
       git:
@@ -45,7 +48,6 @@
         dest: /home/ec2-user/app
         version: main
         force: yes
-      become_user: ec2-user
 
     - name: Clone API repo
       git:
@@ -53,34 +55,29 @@
         dest: /home/ec2-user/Api_Laravel_Ev4
         version: main
         force: yes
-      become_user: ec2-user
 
-    - name: Create .env file
-      copy:
-        dest: /home/ec2-user/app/.env
-        content: |
-          DB_CONNECTION=pgsql
-          DB_HOST=aws-0-us-west-2.pooler.supabase.com
-          DB_PORT=5432
-          DB_DATABASE=postgres
-          DB_USERNAME=postgres.sexytjntuynnllvgaztu
-          DB_PASSWORD=0l2p4wGnCKxwSAXu
-          DB_SSLMODE=require
-        owner: ec2-user
-        group: ec2-user
+    - name: Create .env
+      shell: |
+        cat > /home/ec2-user/app/.env <<'EOF'
+        DB_CONNECTION=pgsql
+        DB_HOST=aws-0-us-west-2.pooler.supabase.com
+        DB_PORT=5432
+        DB_DATABASE=postgres
+        DB_USERNAME=postgres.sexytjntuynnllvgaztu
+        DB_PASSWORD=0l2p4wGnCKxwSAXu
+        DB_SSLMODE=require
+        EOF
 
-    - name: Deploy with Docker Compose
+    - name: Deploy Docker Compose
       shell: |
         cd /home/ec2-user/app
-        /usr/local/bin/docker-compose down || true
-        /usr/local/bin/docker-compose up -d --build
-      become_user: ec2-user
+        docker-compose down || true
+        docker-compose up -d --build
 
-    - name: Wait for containers to start
+    - name: Wait for services
       pause:
         seconds: 45
 
     - name: Run migrations
       shell: docker exec api-php php artisan migrate --force
-      become_user: ec2-user
       ignore_errors: yes
