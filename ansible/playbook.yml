@@ -74,7 +74,9 @@
     - name: Deploy Docker Compose
       shell: |
         cd /home/ec2-user/app
-        docker-compose down || true
+        docker stop api-php api-nginx || true
+        docker rm api-php api-nginx || true
+        docker-compose pull
         docker-compose up -d --build
 
     - name: Wait for services
