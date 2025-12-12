@@ -5,6 +5,8 @@ services:
     image: panc1to/laravel-api:latest
     container_name: api-php
     env_file: /home/ec2-user/app/.env
+    volumes:
+      - /home/ec2-user/app/.env:/var/www/html/.env:ro
     expose:
       - "9000"
     networks:
