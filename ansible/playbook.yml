@@ -1,0 +1,64 @@
+---
+- name: Deploy API Laravel
+  hosts: api_servers
+  become: yes
+
+  tasks:
+    - name: Update system
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker.io
+          - docker-compose
+          - git
+        state: present
+
+    - name: Start Docker
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add ec2-user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+
+    - name: Clone infrastructure repo
+      git:
+        repo: https://github.com/Soyeldiego3/Infraestructura_Ev4.git
+        dest: /home/ec2-user/app
+        version: main
+
+    - name: Clone API repo
+      git:
+        repo: https://github.com/Soyeldiego3/Api_Laravel_Ev4.git
+        dest: /home/ec2-user/Api_Laravel_Ev4
+        version: main
+
+    - name: Create .env file
+      copy:
+        dest: /home/ec2-user/app/.env
+        content: |
+          DB_CONNECTION=pgsql
+          DB_HOST=aws-0-us-west-2.pooler.supabase.com
+          DB_PORT=5432
+          DB_DATABASE=postgres
+          DB_USERNAME=postgres.sexytjntuynnllvgaztu
+          DB_PASSWORD=0l2p4wGnCKxwSAXu
+          DB_SSLMODE=require
+
+    - name: Deploy with Docker Compose
+      shell: |
+        cd /home/ec2-user/app
+        docker-compose down
+        docker-compose up -d --build
+
+    - name: Run migrations
+      shell: docker exec api-php php artisan migrate --force
+      ignore_errors: yes

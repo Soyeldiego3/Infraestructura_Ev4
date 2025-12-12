@@ -1,0 +1,3 @@
+*.pem
+ansible/inventory.ini
+.env
