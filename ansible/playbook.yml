@@ -59,6 +59,9 @@
     - name: Create .env
       shell: |
         cat > /home/ec2-user/app/.env <<'EOF'
+        APP_KEY=base64:xMLjgI6asomknUUccJ2EGoT/x7y7p6KzTc93xNHxXNg=
+        APP_ENV=production
+        APP_DEBUG=false
         DB_CONNECTION=pgsql
         DB_HOST=aws-0-us-west-2.pooler.supabase.com
         DB_PORT=5432
