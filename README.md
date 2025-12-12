@@ -48,4 +48,4 @@ Para que el pipeline funcione, es necesario configurar los siguientes "Secrets" 
 -   **GitHub Actions**: Para la orquestación del pipeline de CI/CD.
 -   **Ansible**: Para la automatización de la configuración y el despliegue en el servidor.
 -   **SonarQube**: Para el análisis estático y el aseguramiento de la calidad del código.
--   **AWS EC2**: Como plataforma de hosting para la aplicación
+-   **AWS EC2**: Como plataforma de hosting para la aplicación.
